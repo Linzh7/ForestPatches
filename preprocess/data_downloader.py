@@ -70,19 +70,19 @@ if __name__ == '__main__':
     # download images
     # NOTE: i cannot download images in some situations, maybe they limit the number of requests
     for info in tqdm.tqdm(info_list):
-        for box in get_submap(hel_range, 0.1):
+        for box in get_submap(hel_range, 0.01):
             print(
                 f'Laying {info["layer"]} on {box}, style: {info["style"][0]}, srs: {info["crs"][0]}'
             )
             img = hel_map.getmap(layers=[info['layer']],
-                                 styles=[info['style'][0]],
+                                 styles=[''],
                                  srs=info['crs'][0],
                                  bbox=box,
                                  size=(512, 512),
                                  format='image/png',
-                                 transparent=True)
+                                 transparent=False)
             with open(f'./data/{info["layer"]}_{box}.png', 'wb') as f:
                 f.write(img.read())
-            time.sleep(0.5)
-            break
-        # break
+            time.sleep(1)
+            # break
+        break
