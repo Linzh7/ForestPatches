@@ -140,3 +140,8 @@ dmypy.json
 *.zip
 *.tar.*
 LearningDiary.Rmd
+*.jpg
+*.png
+*.gif
+*.jpeg
+*.svg
