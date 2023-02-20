@@ -21,6 +21,8 @@ COLOR_LIST = [(255, 255, 255), (0, 114, 254)]
 
 file_list = lu.getFileList(INPUT_PATH)
 
+if not os.path.exists(OUTPUT_PATH):
+    os.makedirs(OUTPUT_PATH)
 for file in file_list:
     file_path = os.path.join(INPUT_PATH, file)
     if not file.endswith(('.jpg', '.png', '.jpeg')):  # skip non-image files

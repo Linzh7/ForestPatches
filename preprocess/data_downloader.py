@@ -1,5 +1,6 @@
 from owslib.wms import WebMapService
 import numpy as np
+import os
 
 URL = {
     "luke":
@@ -10,12 +11,19 @@ URL = {
     "https://paikkatieto.ymparisto.fi/arcgis/services/INSPIRE/SYKE_Maanpeite/MapServer/WMSServer?request=GetCapabilities&service=WMS"
 }
 
-wms = WebMapService(URL["luke"], version='1.3.0')
+# NEED TO EDIT FOR DIFFERENT DATA
+## e.g., Image: "avoindata:Ortoilmakuva_2019_20cm", Mask(luke): "kuusi_1519"
+DATASET = "kuusi_1519"
+# server name, (helsinki, luke, syke)
+WMS_SERVER = "luke"
+# make sure that the prefix are same in map and masks
+DATA_NAME = 'helsinki2019'
 
-OUT_DIR = "./data/helsinki2019/color_masks/"
-# e.g., in 2019:
-# Image: "avoindata:Ortoilmakuva_2019_20cm", Mask: "kuusi_1519"
-dataset = "kuusi_1519"
+# output dir
+OUT_DIR = f"./data/{DATA_NAME}/"
+
+# server
+wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 
 # boundary coordinates
 x_min = 24.90468
@@ -31,16 +39,23 @@ xs = np.linspace(x_min, x_max, no_tiles_x + 1)
 ys = np.linspace(y_min, y_max, no_tiles_y + 1)
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
-for i in range(0, no_tiles_x):
-    print(f"processing column {i}")
-    for j in range(0, no_tiles_y):
-        bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
-        img = wms.getmap(layers=[dataset],
-                         srs='CRS:84',
-                         bbox=bbox,
-                         size=(512, 512),
-                         format='image/png')
-        filename = f"{dataset}_{xs[i]}_{ys[j]}_{xs[i+1]}_{ys[j+1]}.png"
-        out = open(OUT_DIR + filename, 'wb')
-        out.write(img.read())
-        out.close()
+if __name__ == "__main__":
+    if WMS_SERVER == 'helsinki':
+        DOWNLOAD_DIR = os.path.join(OUT_DIR, 'images')
+    else:
+        DOWNLOAD_DIR = os.path.join(OUT_DIR, 'color_masks')
+    if not os.path.exists(DOWNLOAD_DIR):
+        os.makedirs(DOWNLOAD_DIR)
+    for i in range(0, no_tiles_x):
+        print(f"processing column {i}")
+        for j in range(0, no_tiles_y):
+            bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
+            img = wms.getmap(layers=[DATASET],
+                             srs='CRS:84',
+                             bbox=bbox,
+                             size=(512, 512),
+                             format='image/png')
+            filename = f"{DATA_NAME}_{i}_{j}.png"
+            out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
+            out.write(img.read())
+            out.close()

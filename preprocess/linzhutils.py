@@ -123,3 +123,8 @@ def getFolderList(path):
 def getFileContent(filePath):
     with open(filePath, 'rb') as fp:
         return fp.read()
+
+
+def checkDir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
