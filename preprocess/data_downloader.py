@@ -40,10 +40,10 @@ ys = np.linspace(y_min, y_max, no_tiles_y + 1)
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
-    if WMS_SERVER == 'helsinki':
-        DOWNLOAD_DIR = os.path.join(OUT_DIR, 'images')
-    else:
-        DOWNLOAD_DIR = os.path.join(OUT_DIR, 'color_masks')
+    DOWNLOAD_DIR = os.path.join(
+        OUT_DIR, 'images' if WMS_SERVER == 'helsinki' else 'color_masks')
+    # FORMAT = 'png' if WMS_SERVER == 'helsinki' else 'jpg'
+    FORMAT = 'png'
     if not os.path.exists(DOWNLOAD_DIR):
         os.makedirs(DOWNLOAD_DIR)
     for i in range(0, no_tiles_x):
@@ -54,8 +54,8 @@ if __name__ == "__main__":
                              srs='CRS:84',
                              bbox=bbox,
                              size=(512, 512),
-                             format='image/png')
-            filename = f"{DATA_NAME}_{i}_{j}.png"
+                             format=f'image/{FORMAT}')
+            filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
             out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
             out.write(img.read())
             out.close()
