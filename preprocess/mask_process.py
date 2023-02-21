@@ -12,6 +12,7 @@ def bin_mask_process(mask, color_list):
                             axis=-1)  # for each color in color_list
         bin_mask = np.logical_or(bin_mask,
                                  color_mask)  # get the union of all colors
+    bin_mask = np.logical_not(bin_mask)  # invert the mask
     return bin_mask * 255  # transform to 0, 255
 
 
@@ -21,6 +22,8 @@ COLOR_LIST = [(255, 255, 255), (0, 114, 254)]
 
 file_list = lu.getFileList(INPUT_PATH)
 
+if not os.path.exists(OUTPUT_PATH):
+    os.makedirs(OUTPUT_PATH)
 for file in file_list:
     file_path = os.path.join(INPUT_PATH, file)
     if not file.endswith(('.jpg', '.png', '.jpeg')):  # skip non-image files
