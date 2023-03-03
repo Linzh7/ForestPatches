@@ -1,3 +1,5 @@
+# python ./test.py
+
 import argparse
 import logging
 import os

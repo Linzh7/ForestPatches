@@ -46,20 +46,17 @@ if __name__ == "__main__":
     FORMAT = 'png'
     if not os.path.exists(DOWNLOAD_DIR):
         os.makedirs(DOWNLOAD_DIR)
-    with open(os.path.join(OUT_DIR, 'range_info.csv'), 'w') as f:
-        for i in range(0, no_tiles_x):
-            print(f"processing column {i}")
-            for j in range(0, no_tiles_y):
-                bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
-                img = wms.getmap(layers=[DATASET],
-                                 srs='CRS:84',
-                                 bbox=bbox,
-                                 size=(512, 512),
-                                 format=f'image/{FORMAT}')
-                filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
-                f.write(f"{filename},{x_min},{y_min},{x_max},{y_max}\n")
-                out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
-                out.write(img.read())
-                out.close()
-                break
-            break
+    with open('./ranges.csv',
+    for i in range(0, no_tiles_x):
+        print(f"processing column {i}")
+        for j in range(0, no_tiles_y):
+            bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
+            img = wms.getmap(layers=[DATASET],
+                             srs='CRS:84',
+                             bbox=bbox,
+                             size=(512, 512),
+                             format=f'image/{FORMAT}')
+            filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
+            out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
+            out.write(img.read())
+            out.close()
