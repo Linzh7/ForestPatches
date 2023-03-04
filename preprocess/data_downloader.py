@@ -13,9 +13,9 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: "avoindata:Ortoilmakuva_2019_20cm", Mask(luke): "kuusi_1519"
-DATASET = "kuusi_1519"
+DATASET = "avoindata:Ortoilmakuva_2019_20cm"
 # server name, (helsinki, luke, syke)
-WMS_SERVER = "luke"
+WMS_SERVER = "helsinki"
 # make sure that the prefix are same in map and masks
 DATA_NAME = 'helsinki2019'
 
@@ -57,9 +57,11 @@ if __name__ == "__main__":
                                  size=(512, 512),
                                  format=f'image/{FORMAT}')
                 filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
-                f.write(f"{filename},{x_min},{y_min},{x_max},{y_max}\n")
+                f.write(
+                    f"{filename},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
+                )
                 out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
                 out.write(img.read())
                 out.close()
-                break
-            break
+            #     break
+            # break
