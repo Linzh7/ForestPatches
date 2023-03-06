@@ -1,6 +1,7 @@
 from owslib.wms import WebMapService
 import numpy as np
 import os
+import tqdm
 
 URL = {
     "luke":
@@ -13,11 +14,11 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: "avoindata:Ortoilmakuva_2019_20cm", Mask(luke): "kuusi_1519"
-DATASET = "kuusi_1519"
+DATASET = ["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519']
 # server name, (helsinki, luke, syke)
 WMS_SERVER = "luke"
 # make sure that the prefix are same in map and masks
-DATA_NAME = 'helsinki2019'
+DATA_NAME = 'hel2019'
 
 # output dir
 OUT_DIR = f"./data/{DATA_NAME}/"
@@ -40,22 +41,29 @@ ys = np.linspace(y_min, y_max, no_tiles_y + 1)
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
-    DOWNLOAD_DIR = os.path.join(
-        OUT_DIR, 'images' if WMS_SERVER == 'helsinki' else 'color_masks')
-    # FORMAT = 'png' if WMS_SERVER == 'helsinki' else 'jpg'
-    FORMAT = 'png'
-    if not os.path.exists(DOWNLOAD_DIR):
-        os.makedirs(DOWNLOAD_DIR)
-    for i in range(0, no_tiles_x):
-        print(f"processing column {i}")
-        for j in range(0, no_tiles_y):
-            bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
-            img = wms.getmap(layers=[DATASET],
-                             srs='CRS:84',
-                             bbox=bbox,
-                             size=(512, 512),
-                             format=f'image/{FORMAT}')
-            filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
-            out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
-            out.write(img.read())
-            out.close()
+    with open(os.path.join(OUT_DIR, 'range_info.csv'), 'w') as f:
+        for dataset in DATASET:
+            print(f"Processing dataset {dataset}")
+            DOWNLOAD_DIR = os.path.join(
+                OUT_DIR,
+                'images' if WMS_SERVER == 'helsinki' else 'color_masks',
+                dataset)
+            # FORMAT = 'png' if WMS_SERVER == 'helsinki' else 'jpg'
+            FORMAT = 'png'
+            if not os.path.exists(DOWNLOAD_DIR):
+                os.makedirs(DOWNLOAD_DIR)
+            for i in tqdm.tqdm(range(0, no_tiles_x)):
+                for j in range(0, no_tiles_y):
+                    bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
+                    img = wms.getmap(layers=[dataset],
+                                     srs='CRS:84',
+                                     bbox=bbox,
+                                     size=(512, 512),
+                                     format=f'image/{FORMAT}')
+                    filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
+                    out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
+                    out.write(img.read())
+                    out.close()
+                    f.write(
+                        f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
+                    )
