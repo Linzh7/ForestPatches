@@ -5,18 +5,17 @@ from tqdm import tqdm
 import linzhutils as lu
 import argparse
 
-
-
 parser = argparse.ArgumentParser(prog='Geo Data Downloader',
                                  description='download dataset',
                                  epilog='Text at the bottom of help')
-parser.add_argument('-s',
-                    '--dataset',
-                    type=int,
-                    # default=1,
-                    help='0. luke (mask)\n1. helsinki (map)\n2. syke (mask)',
-                    # )
-                    required=True)
+parser.add_argument(
+    '-s',
+    '--dataset',
+    type=int,
+    # default=1,
+    help='0. luke (mask)\n1. helsinki (map)\n2. syke (mask)',
+    # )
+    required=True)
 parser.add_argument('-d',
                     '--dir',
                     type=str,
@@ -76,22 +75,27 @@ wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 # boundary coordinates
 # 100m in Helsinki area is about 0.0009 longitude, and 0.0012 latitude
 TILE_SIZE = args.size  # 100m
-SIZE = (int(512*TILE_SIZE), int(512*TILE_SIZE))
+SIZE = (int(512 * TILE_SIZE), int(512 * TILE_SIZE))
 LONG_IN_M = 0.00090009001 * TILE_SIZE
 LATI_IN_M = 0.00127279275 * TILE_SIZE
 
 # Biggest size in 2019
-# 60.14938,25.2522°
-x_min = 24.819182
-y_min = 60.1212
-x_max = 25.2717
-y_max = 60.295403
+# x_min = 24.819182
+# y_min = 60.1212
+# x_max = 25.2717
+# y_max = 60.295403
+
+# normal size
+# x_min = 24.822
+# y_min = 60.207
+# x_max = 25.1816
+# y_max = 60.295403
 
 # Test train size, smaller
-# x_min = 24.8593
-# y_min = 60.2003
-# x_max = 24.9484
-# y_max = 60.2834
+x_min = 24.8593
+y_min = 60.2003
+x_max = 24.9484
+y_max = 60.2834
 
 # no_tiles_x = 10  #number of pictures along x-axis
 # no_tiles_y = 10  #number of pictures along y-axis
@@ -107,8 +111,8 @@ print(
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
     lu.checkDir(OUT_DIR)
-    with open(os.path.join(OUT_DIR, 'image_range_info.csv'), 'w') as f:
-        for dataset in DATASET:
+    for dataset in DATASET:
+        with open(os.path.join(OUT_DIR, f'{dataset}_range_info.csv'), 'w') as f:
             print(f"Processing dataset {dataset}")
             DOWNLOAD_DIR = os.path.join(
                 OUT_DIR,
@@ -130,7 +134,7 @@ if __name__ == "__main__":
                         out.write(img.read())
                         out.close()
                     except Exception as e:
-                        print(f"Error: {e}")
+                        print(f"Error: {e}, at {bbox}")
                         continue
                     f.write(
                         f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"

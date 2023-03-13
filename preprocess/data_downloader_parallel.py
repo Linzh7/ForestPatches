@@ -30,7 +30,7 @@ parser.add_argument('-f',
 parser.add_argument('-m',
                     '--maxthreads',
                     type=int,
-                    default=3,
+                    default=4,
                     help='the max number of threads')
 parser.add_argument('-z',
                     '--size',
@@ -55,8 +55,8 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: ["avoindata:Ortoilmakuva_2019_20cm"], Mask(luke): ["kuusi_1519",xxxxx]
-
-DATASET_LIST = [["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519'],
+# , 'manty_1519', 'koivu_1519', 'muulp_1519'
+DATASET_LIST = [["kuusi_1519"],
                 ["avoindata:Ortoilmakuva_2019_20cm"]]
 DATASET = DATASET_LIST[args.dataset]
 # server name, (helsinki, luke, syke)
@@ -82,19 +82,23 @@ LATI_IN_M = 0.00127279275 * TILE_SIZE
 
 # Biggest size in 2019
 # 60.14938,25.2522°
-x_min = 24.819182
-y_min = 60.1212
-x_max = 25.2717
-y_max = 60.295403
+# x_min = 24.819182
+# y_min = 60.1212
+# x_max = 25.2717
+# y_max = 60.295403
+
+# normal size
+# x_min = 24.822
+# y_min = 60.207
+# x_max = 25.1816
+# y_max = 60.295403
 
 # Test train size, smaller
-# x_min = 24.8593
-# y_min = 60.2003
-# x_max = 24.9484
-# y_max = 60.2834
+x_min = 24.8593
+y_min = 60.2003
+x_max = 24.9484
+y_max = 60.2834
 
-# no_tiles_x = 10  #number of pictures along x-axis
-# no_tiles_y = 10  #number of pictures along y-axis
 
 # the boundaries for small pictures
 xs = np.arange(x_min, x_max, LONG_IN_M)
@@ -119,7 +123,7 @@ def download_tile(dataset, filename, bbox):
         out.write(img.read())
         out.close()
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}, at {bbox}")
         FAIL_LIST.append(1)
     f.write(
         f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
@@ -134,8 +138,8 @@ def update_progress(*_):
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
     lu.checkDir(OUT_DIR)
-    with open(os.path.join(OUT_DIR, 'image_range_info.csv'), 'w') as f:
-        for dataset in DATASET:
+    for dataset in DATASET:
+        with open(os.path.join(OUT_DIR, f'{dataset}_range_info.csv'), 'w') as f:
             print(f"Processing dataset {dataset}")
             DOWNLOAD_DIR = os.path.join(
                 OUT_DIR,
