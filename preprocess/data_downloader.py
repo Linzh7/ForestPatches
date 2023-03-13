@@ -55,8 +55,8 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: ["avoindata:Ortoilmakuva_2019_20cm"], Mask(luke): ["kuusi_1519",xxxxx]
-
-DATASET_LIST = [["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519'],
+# ["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519']
+DATASET_LIST = [["kuusi_1519"],
                 ["avoindata:Ortoilmakuva_2019_20cm"]]
 DATASET = DATASET_LIST[args.dataset]
 # server name, (helsinki, luke, syke)

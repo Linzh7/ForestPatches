@@ -30,7 +30,7 @@ parser.add_argument('-f',
 parser.add_argument('-m',
                     '--maxthreads',
                     type=int,
-                    default=2,
+                    default=3,
                     help='the max number of threads')
 parser.add_argument('-z',
                     '--size',
@@ -82,16 +82,16 @@ LATI_IN_M = 0.00127279275 * TILE_SIZE
 
 # Biggest size in 2019
 # 60.14938,25.2522°
-# x_min = 24.819182
-# y_min = 60.1212
-# x_max = 25.2717
-# y_max = 60.295403
+x_min = 24.819182
+y_min = 60.1212
+x_max = 25.2717
+y_max = 60.295403
 
 # Test train size, smaller
-x_min = 24.8593
-y_min = 60.2003
-x_max = 24.9484
-y_max = 60.2834
+# x_min = 24.8593
+# y_min = 60.2003
+# x_max = 24.9484
+# y_max = 60.2834
 
 # no_tiles_x = 10  #number of pictures along x-axis
 # no_tiles_y = 10  #number of pictures along y-axis
