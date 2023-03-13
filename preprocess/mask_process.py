@@ -95,8 +95,8 @@ def bin_mask_process(file_name,
             target_count[mask] += color_map[label]['number'][i]
     # get the binary mask
     bin_mask = kuusi_tree_count > other_tree_count
-    return bin_mask * 255  # return the binary mask as black-white images (0-255)
-
+    # return bin_mask * 255  # return the binary mask as black-white images (0-255)
+    return bin_mask * 1 # for 0 - background, 1 - target class values
 
 if __name__ == '__main__':
     if not os.path.exists(OUTPUT_PATH):

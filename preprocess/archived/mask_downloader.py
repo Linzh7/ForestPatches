@@ -15,11 +15,10 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: ["avoindata:Ortoilmakuva_2019_20cm"], Mask(luke): ["kuusi_1519",xxxxx]
-# DATASET = ["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519']
-DATASET = ["avoindata:Ortoilmakuva_2019_20cm"]
+DATASET = ["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519']
+# DATASET = ["avoindata:Ortoilmakuva_2019_20cm"]
 # server name, (helsinki, luke, syke)
-#WMS_SERVER = "luke"
-WMS_SERVER = "helsinki"
+WMS_SERVER = "luke"
 # make sure that the prefix are same in map and masks
 DATA_NAME = 'hel2019'
 # image format， png is required for masks, otherwise jpg is fine.
@@ -33,9 +32,8 @@ wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 
 # boundary coordinates
 # 100m in Helsinki area is about 0.0009 longitude, and 0.0012 latitude
-TILE_SIZE = 1 # 100m
-LONG_IN_M = 0.00090009001 * TILE_SIZE
-LATI_IN_M = 0.00127279275 * TILE_SIZE
+LONG_IN_M = 0.00090009001 * 1 # 100m
+LATI_IN_M = 0.00127279275 * 1
 
 # Biggest size in 2019
 # 60.14938,25.2522°
@@ -57,12 +55,10 @@ y_max = 60.295403
 xs = np.arange(x_min, x_max, LONG_IN_M)
 ys = np.arange(y_min, y_max, LATI_IN_M)
 
-print(f"Tile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})")
-
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
     lu.checkDir(OUT_DIR)
-    with open(os.path.join(OUT_DIR, 'image_range_info.csv'), 'w') as f:
+    with open(os.path.join(OUT_DIR, 'mask_range_info.csv'), 'w') as f:
         for dataset in DATASET:
             print(f"Processing dataset {dataset}")
             DOWNLOAD_DIR = os.path.join(
