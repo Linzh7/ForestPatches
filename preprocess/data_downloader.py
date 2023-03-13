@@ -3,6 +3,32 @@ import numpy as np
 import os
 import tqdm
 import linzhutils as lu
+import argparse
+
+parser = argparse.ArgumentParser(prog='Geo Data Downloader',
+                                 description='download dataset',
+                                 epilog='Text at the bottom of help')
+parser.add_argument('-s',
+                    '--dataset',
+                    type=int,
+                    help='0. luke (mask)\n1. helsinki (map)\n2. syke (mask)',
+                    required=True)
+parser.add_argument('-d',
+                    '--dir',
+                    type=str,
+                    default='hel2019',
+                    help='the output dir, will be filled with ./data/{dir}')
+parser.add_argument('-f',
+                    '--format',
+                    type=str,
+                    default='png',
+                    help='the  filename extension of output files')
+
+# parser.add_argument('--', type=str, default='a12', help='dataset parameter')
+
+args = parser.parse_args()
+
+print(args)
 
 URL = {
     "luke":
@@ -15,15 +41,17 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: ["avoindata:Ortoilmakuva_2019_20cm"], Mask(luke): ["kuusi_1519",xxxxx]
-# DATASET = ["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519']
-DATASET = ["avoindata:Ortoilmakuva_2019_20cm"]
+
+DATASET_LIST = [["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519'],
+                ["avoindata:Ortoilmakuva_2019_20cm"]]
+DATASET = DATASET_LIST[args.dataset]
 # server name, (helsinki, luke, syke)
-#WMS_SERVER = "luke"
-WMS_SERVER = "helsinki"
+WMS_SERVER_LIST = ["luke", "helsinki"]
+WMS_SERVER = WMS_SERVER_LIST[args.dataset]
 # make sure that the prefix are same in map and masks
-DATA_NAME = 'hel2019'
+DATA_NAME = args.dir
 # image format， png is required for masks, otherwise jpg is fine.
-FORMAT = 'png'
+FORMAT = args.format
 
 # output dir
 OUT_DIR = f"./data/{DATA_NAME}/"
@@ -33,7 +61,7 @@ wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 
 # boundary coordinates
 # 100m in Helsinki area is about 0.0009 longitude, and 0.0012 latitude
-TILE_SIZE = 1 # 100m
+TILE_SIZE = 1  # 100m
 LONG_IN_M = 0.00090009001 * TILE_SIZE
 LATI_IN_M = 0.00127279275 * TILE_SIZE
 
@@ -57,7 +85,9 @@ y_max = 60.295403
 xs = np.arange(x_min, x_max, LONG_IN_M)
 ys = np.arange(y_min, y_max, LATI_IN_M)
 
-print(f"Tile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})")
+print(
+    f"Tile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})"
+)
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
@@ -71,8 +101,8 @@ if __name__ == "__main__":
                 '' if WMS_SERVER == 'helsinki' else dataset.split('_')[0],
             )
             lu.checkDir(DOWNLOAD_DIR)
-            for i in tqdm.tqdm(range(len(xs)-1)):
-                for j in range(len(ys)-1):
+            for i in tqdm.tqdm(range(len(xs) - 1)):
+                for j in range(len(ys) - 1):
                     bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
                     try:
                         img = wms.getmap(layers=[dataset],
