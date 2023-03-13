@@ -4,8 +4,8 @@ import os
 from tqdm import tqdm
 import linzhutils as lu
 import argparse
-
-
+import threading
+import concurrent.futures
 
 parser = argparse.ArgumentParser(prog='Geo Data Downloader',
                                  description='download dataset',
@@ -27,11 +27,11 @@ parser.add_argument('-f',
                     type=str,
                     default='png',
                     help='the filename extension of output files')
-# parser.add_argument('-m',
-#                     '--maxthreads',
-#                     type=int,
-#                     default=2,
-#                     help='the max number of threads')
+parser.add_argument('-m',
+                    '--maxthreads',
+                    type=int,
+                    default=2,
+                    help='the max number of threads')
 parser.add_argument('-z',
                     '--size',
                     type=int,
@@ -74,7 +74,7 @@ OUT_DIR = f"./data/{DATA_NAME}/"
 wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 
 # boundary coordinates
-# 100m in Helsinki area is about 0.0009 longitude, and 0.0012 latitude
+# 100m in Helsinki area is about longitude 0.00090009001 degree, and latitude 0.00127279275 degree
 TILE_SIZE = args.size  # 100m
 SIZE = (int(512*TILE_SIZE), int(512*TILE_SIZE))
 LONG_IN_M = 0.00090009001 * TILE_SIZE
@@ -82,16 +82,16 @@ LATI_IN_M = 0.00127279275 * TILE_SIZE
 
 # Biggest size in 2019
 # 60.14938,25.2522°
-x_min = 24.819182
-y_min = 60.1212
-x_max = 25.2717
-y_max = 60.295403
+# x_min = 24.819182
+# y_min = 60.1212
+# x_max = 25.2717
+# y_max = 60.295403
 
 # Test train size, smaller
-# x_min = 24.8593
-# y_min = 60.2003
-# x_max = 24.9484
-# y_max = 60.2834
+x_min = 24.8593
+y_min = 60.2003
+x_max = 24.9484
+y_max = 60.2834
 
 # no_tiles_x = 10  #number of pictures along x-axis
 # no_tiles_y = 10  #number of pictures along y-axis
@@ -101,8 +101,35 @@ xs = np.arange(x_min, x_max, LONG_IN_M)
 ys = np.arange(y_min, y_max, LATI_IN_M)
 
 print(
-    f"Tile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})"
+    f"Dataset: {DATASET}, \nserver: {WMS_SERVER}, \ntile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})"
 )
+
+SUCCESS_LIST = []
+FAIL_LIST = []
+
+
+def download_tile(dataset, filename, bbox):
+    try:
+        img = wms.getmap(layers=[dataset],
+                         srs='CRS:84',
+                         bbox=bbox,
+                         size=SIZE,
+                         format=f'image/{FORMAT}')
+        out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
+        out.write(img.read())
+        out.close()
+    except Exception as e:
+        print(f"Error: {e}")
+        FAIL_LIST.append(1)
+    f.write(
+        f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
+    )
+    SUCCESS_LIST.append(1)
+
+
+def update_progress(*_):
+    progress_bar.update()
+
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
@@ -116,22 +143,38 @@ if __name__ == "__main__":
                 '' if WMS_SERVER == 'helsinki' else dataset.split('_')[0],
             )
             lu.checkDir(DOWNLOAD_DIR)
-            for i in tqdm(range(len(xs) - 1)):
-                for j in range(len(ys) - 1):
-                    bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
-                    try:
-                        img = wms.getmap(layers=[dataset],
-                                         srs='CRS:84',
-                                         bbox=bbox,
-                                         size=SIZE,
-                                         format=f'image/{FORMAT}')
+            threads = []
+            with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=args.maxthreads) as executor:
+                args_list = []
+                for i in range(len(xs) - 1):
+                    for j in range(len(ys) - 1):
+                        bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
                         filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
-                        out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
-                        out.write(img.read())
-                        out.close()
-                    except Exception as e:
-                        print(f"Error: {e}")
-                        continue
-                    f.write(
-                        f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
-                    )
+                        args_list.append((dataset, filename, bbox))
+                futures = [
+                    executor.submit(download_tile, *args) for args in args_list
+                ]
+                progress_bar = tqdm(total=len(args_list))
+                for future in concurrent.futures.as_completed(futures):
+                    progress_bar.update()
+                    future.result()
+                progress_bar.close()
+                # for i in range(len(xs) - 1):
+                #     for j in range(len(ys) - 1):
+                #         bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
+                #         filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
+                #         # download_tile(dataset, filename, bbox)
+                #         t = threading.Thread(target=download_tile,
+                #                              args=(dataset, filename, bbox))
+                #         threads.append(t)
+                # with tqdm(total=len(threads)) as pbar:
+                #     for t in threads:
+                #         t.start()
+                #         pbar.update(1)
+                #     for t in threads:
+                #         t.join()
+                print(f'Done with {dataset}')
+                print(f"Success: {len(SUCCESS_LIST)}, Fail: {len(FAIL_LIST)}")
+                SUCCESS_LIST = []
+                FAIL_LIST = []
