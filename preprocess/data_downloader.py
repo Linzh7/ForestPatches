@@ -1,18 +1,20 @@
 from owslib.wms import WebMapService
 import numpy as np
 import os
-import tqdm
+from tqdm import tqdm
 import linzhutils as lu
 import argparse
+import threading
 
 parser = argparse.ArgumentParser(prog='Geo Data Downloader',
                                  description='download dataset',
                                  epilog='Text at the bottom of help')
-parser.add_argument('-s',
-                    '--dataset',
-                    type=int,
-                    help='0. luke (mask)\n1. helsinki (map)\n2. syke (mask)',
-                    required=True)
+parser.add_argument(
+    '-s',
+    '--dataset',
+    type=int,
+    help='0. luke (mask)\n1. helsinki (map)\n2. syke (mask)',
+    required=True)
 parser.add_argument('-d',
                     '--dir',
                     type=str,
@@ -52,6 +54,8 @@ WMS_SERVER = WMS_SERVER_LIST[args.dataset]
 DATA_NAME = args.dir
 # image format， png is required for masks, otherwise jpg is fine.
 FORMAT = args.format
+# size of image
+SIZE = (512, 512)
 
 # output dir
 OUT_DIR = f"./data/{DATA_NAME}/"
@@ -86,8 +90,31 @@ xs = np.arange(x_min, x_max, LONG_IN_M)
 ys = np.arange(y_min, y_max, LATI_IN_M)
 
 print(
-    f"Tile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})"
+    f"Dataset: {DATASET}, \nserver: {WMS_SERVER}, \ntile size: {TILE_SIZE}, \ndataset size:{len(xs)}x{len(ys)} tiles,\nRange: ({x_min}, {y_min}), ({x_max}, {y_max})"
 )
+
+SUCCESS_LIST = []
+FAIL_LIST = []
+
+
+def download_tile(dataset, filename, bbox):
+    try:
+        img = wms.getmap(layers=[dataset],
+                         srs='CRS:84',
+                         bbox=bbox,
+                         size=SIZE,
+                         format=f'image/{FORMAT}')
+        out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
+        out.write(img.read())
+        out.close()
+    except Exception as e:
+        print(f"Error: {e}")
+        FAIL_LIST.append(1)
+    f.write(
+        f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
+    )
+    SUCCESS_LIST.append(1)
+
 
 # NOTE: download images as PNG, not JPEG, to avoid compression artifacts. Especially for masks.
 if __name__ == "__main__":
@@ -101,22 +128,22 @@ if __name__ == "__main__":
                 '' if WMS_SERVER == 'helsinki' else dataset.split('_')[0],
             )
             lu.checkDir(DOWNLOAD_DIR)
-            for i in tqdm.tqdm(range(len(xs) - 1)):
+            threads = []
+            for i in range(len(xs) - 1):
                 for j in range(len(ys) - 1):
                     bbox = (xs[i], ys[j], xs[i + 1], ys[j + 1])
-                    try:
-                        img = wms.getmap(layers=[dataset],
-                                         srs='CRS:84',
-                                         bbox=bbox,
-                                         size=(512, 512),
-                                         format=f'image/{FORMAT}')
-                        filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
-                        out = open(os.path.join(DOWNLOAD_DIR, filename), 'wb')
-                        out.write(img.read())
-                        out.close()
-                    except Exception as e:
-                        print(f"Error: {e}")
-                        continue
-                    f.write(
-                        f"{os.path.join(DOWNLOAD_DIR,filename)},{xs[i]:.8f},{ys[j]:.8f},{xs[i + 1]:.8f},{ys[j + 1]:.8f}\n"
-                    )
+                    filename = f"{DATA_NAME}_{i}_{j}.{FORMAT}"
+                    # download_tile(dataset, filename, bbox)
+                    t = threading.Thread(target=download_tile,
+                                         args=(dataset, filename, bbox))
+                    threads.append(t)
+            with tqdm(total=len(threads)) as pbar:
+                for t in threads:
+                    t.start()
+                    pbar.update(1)
+                for t in threads:
+                    t.join()
+            print(f'Done with {dataset}')
+            print(f"Success: {len(SUCCESS_LIST)}, Fail: {len(FAIL_LIST)}")
+            SUCCESS_LIST = []
+            FAIL_LIST = []
