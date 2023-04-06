@@ -52,7 +52,7 @@ COLOR_NUMBER_MAP = {
 
 INPUT_PATH = './data/hel2019/color_masks/'
 OUTPUT_PATH = './data/hel2019/bin_masks/'
-COLOR_LIST = [(255, 255, 255), (0, 114, 254)]
+# COLOR_LIST = [(255, 255, 255), (0, 114, 254)]
 LABEL_LIST = ['koivu', 'muulp', 'manty', 'kuusi']
 
 folder_list = lu.getFolderList(INPUT_PATH)
