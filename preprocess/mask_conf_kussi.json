@@ -1,0 +1,8 @@
+{
+    "input_path": "./data/hel2019/color_masks/",
+    "output_path": "./data/hel2019/bin_masks/",
+    "color_list": [
+        [255, 255, 255],
+        [0, 114, 254]
+    ]
+}
