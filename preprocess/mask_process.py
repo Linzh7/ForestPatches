@@ -11,7 +11,6 @@ import linzhutils as lu
 def get_images(file_name, folder_list, input_path):
     image_dict = defaultdict(lambda: None)
     for folder in folder_list:
-        # print(f'input_path: {input_path}, folder: {folder}, file_name: {file_name}')
         file_path = os.path.join(input_path, folder, file_name)
         # check if the file exists
         if not os.path.exists(file_path):
@@ -68,7 +67,6 @@ if __name__ == '__main__':
     color_map = config["color_map"]
 
     folder_list = lu.getFolderList(input_path)
-    print(folder_list)
     lu.checkDir(output_path)
 
     file_count = []
@@ -81,7 +79,6 @@ if __name__ == '__main__':
 
     file_list = lu.getFileList(os.path.join(input_path, folder_list[0]))
     for file_name in tqdm(file_list):
-        print(file_name)
         bin_mask = bin_mask_process(file_name, default_shape, folder_list,
                                     color_map, input_path)
         cv2.imwrite(os.path.join(output_path, file_name), bin_mask)
