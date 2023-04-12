@@ -37,6 +37,11 @@ parser.add_argument('-z',
                     type=int,
                     default=10,
                     help='unit in 100m, default 10 for 1x1km per tile')
+parser.add_argument('-p',
+                    '--pixels',
+                    type=int,
+                    default=512,
+                    help='how many pixels for 100m')
 
 # parser.add_argument('--', type=str, default='a12', help='dataset parameter')
 
@@ -55,8 +60,8 @@ URL = {
 
 # NEED TO EDIT FOR DIFFERENT DATA
 ## e.g., Image: ["avoindata:Ortoilmakuva_2019_20cm"], Mask(luke): ["kuusi_1519",xxxxx]
-# , 'manty_1519', 'koivu_1519', 'muulp_1519'
-DATASET_LIST = [["kuusi_1519"],
+# 
+DATASET_LIST = [["kuusi_1519", 'manty_1519', 'koivu_1519', 'muulp_1519'],
                 ["avoindata:Ortoilmakuva_2019_20cm"]]
 DATASET = DATASET_LIST[args.dataset]
 # server name, (helsinki, luke, syke)
@@ -68,15 +73,16 @@ DATA_NAME = args.dir
 FORMAT = args.format
 
 # output dir
-OUT_DIR = f"./data/{DATA_NAME}/"
+OUT_DIR = f"/projappl/project_2007251/ForestPatches/preprocess/data/{DATA_NAME}/"
 
 # server
 wms = WebMapService(URL[WMS_SERVER], version='1.3.0')
 
 # boundary coordinates
 # 100m in Helsinki area is about longitude 0.00090009001 degree, and latitude 0.00127279275 degree
-TILE_SIZE = args.size  # 100m
-SIZE = (int(512*TILE_SIZE), int(512*TILE_SIZE))
+TILE_SIZE = args.size
+PIXELS_100m = args.pixels
+SIZE = (int(PIXELS_100m*TILE_SIZE), int(PIXELS_100m*TILE_SIZE))
 LONG_IN_M = 0.00090009001 * TILE_SIZE
 LATI_IN_M = 0.00127279275 * TILE_SIZE
 

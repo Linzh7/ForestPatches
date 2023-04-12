@@ -37,7 +37,7 @@ NB: If you are using Macbook with Apple silicon, you can install `mediapipe-sili
 ### Download dataset
 
 TODO: 
-- [ ] add argument parser
+- [x] add argument parser
 1. run `preprocess/data_downloader.py`, such as `python preprocess/data_downloader.py`.
 
 ### Process the masks and images

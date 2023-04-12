@@ -116,8 +116,7 @@ def getAllFileList(path):
 
 
 def getFolderList(path):
-    for a, folder, c in os.walk(path):
-        return folder
+    return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
 
 
 def getFileContent(filePath):
