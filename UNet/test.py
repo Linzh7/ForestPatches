@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+from tqdm import tqdm
 
 import numpy as np
 import torch
@@ -42,18 +43,18 @@ def get_args():
         description='Predict masks from input images')
     parser.add_argument('--model',
                         '-m',
-                        default='./UNet/MODEL.pth',
+                        default='./MODEL.pth',
                         metavar='FILE',
                         help='Specify the file in which the model is stored')
     parser.add_argument('--input',
                         '-i',
                         metavar='INPUT',
-                        default='./data/helsinki2019/images/',
+                        default='../data/helsinki2019/images/',
                         help='Folder of input images')
     parser.add_argument('--output',
                         '-o',
                         metavar='OUTPUT',
-                        default='./data/helsinki2019/test_output/',
+                        default='../data/helsinki2019/test_output/',
                         help='Folder of output images')
     parser.add_argument('--viz',
                         '-v',
@@ -127,9 +128,13 @@ if __name__ == '__main__':
 
     file_list = lz.getFileListFromPattern(in_files, pattern='*.png')
     lz.checkDir(out_files)
+    
+    file_list = list(file_list)    
+    print(f"Total {len(file_list)} images to process...")
+    
+    for filename in tqdm(file_list):
+        #logging.info(f'Predicting image {filename} ...')
 
-    for filename in file_list:
-        logging.info(f'Predicting image {filename} ...')
         img = Image.open(filename)
 
         mask = predict_img(net=net,
@@ -142,7 +147,7 @@ if __name__ == '__main__':
             out_filename = os.path.join(out_files, os.path.basename(filename))
             result = mask_to_image(mask, mask_values)
             result.save(out_filename)
-            logging.info(f'Mask saved to {out_filename}')
+           # logging.info(f'Mask saved to {out_filename}')
 
         if args.viz:
             logging.info(

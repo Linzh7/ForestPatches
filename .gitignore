@@ -145,3 +145,4 @@ LearningDiary.Rmd
 *.gif
 *.jpeg
 *.svg
+*/wandb/
