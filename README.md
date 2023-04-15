@@ -1,21 +1,74 @@
 # Forest Patches
 
-This project is aimed to ...
+Welcome to our research project, where we aim to investigate the impact of past forest fragmentation on the evolution of insect population traits. To achieve this, we are exploring ways to digitize, detect, and extract past forest patches from historical aerial photographs. Our primary objective is to develop a tool that can accurately classify forest and non-forest areas with a specific threshold based on ground truth data. The tool will help us detect past forest patches, starting from present aerial images and going back to older images. Students working on this project will supervise open access aerial images with two possible ground truth datasets: biomass and canopy cover raster GIS data sets provided by the Natural Resources Institute Finland, and the Corine Land Cover (CLC) GIS data set about land use types provided by the Finnish Environmental Institute. As we move towards older aerial images, ground truth data become scarce or non-existent, and we will rely on the tool's training on newer or present data to recognize forest patches. Key elements for image recognition and classification are image texture and relative differences in color attributes. Aerial photographs are from different phenological stages and light conditions. Newer images are colored, whereas older ones are grayscale. Open access aerial images are available through the WMS interface provided by the HRI (Helsinki Region Infoshare) from 1932 to 2021.
 
 
 ## Stucture of project
 
+This project is organized into several directories each serving a specific purpose:
+
+- GAN: Contains the source code for the Generative Adversarial Network used for image colorization. This includes the colorize.py script which is used to colorize grayscale images, as well as a modified version of the fastai library and the deoldify library which provides models and utilities for training and running the GAN.
+- model_zoo: Contains fine-tuned semantic segmentation models and training scripts.
+- preprocess: Contains utilities for downloading and preprocessing data used in training our model.
+- UNet: Contains the source code for the semantic segmentation neural network used for image segmentation. This includes the train.py and predict.py scripts for training and testing the model, as well as various utility functions for data loading and processing.
 ```
 .
+├── GAN
+│   ├── colorize.py
+│   ├── deoldify
+│   │   ├── ...
+│   ├── environment.yml
+│   ├── fastai
+│   │   ├── ...
+│   ├── fid
+│   │   ├── ...
+│   ├── ImageColorizerArtistic.ipynb
+│   ├── ImageColorizerStable.ipynb
+│   ├── linzhutils.py
+│   ├── models
+│   │   ├── ...
+│   ├── requirements.txt
+│   └── setup.py
+├── model_zoo
+│   ├── linzhutils.py
+│   ├── models
+│   │   ├── ...
+│   └── train.ipynb
+├── preprocess
+│   ├── color_picker.py
+│   ├── data_downloader_parallel.py
+│   ├── data_downloader.py
+│   ├── data_downloader.py.bak
+│   ├── linzhutils.py
+│   ├── mask_process_kuusi.py
+│   ├── mask_process.py
 ├── README.md
-├── UNet
-├── data
-└── preprocess
-    ├── archived  # archived files
-    ├── color_picker.py  # Utils for pick the color in a image
-    ├── data_downloader.py  # download dataset from WMS
-    ├── linzhutils.py  # my tools collection
-    └── mask_process.py  # process masks to a binary mask
+└── UNet
+    ├── checkpoints
+    │   ├── ...
+    ├── data
+    │   └── ...
+    ├── Dockerfile
+    ├── evaluate.py
+    ├── hubconf.py
+    ├── LICENSE
+    ├── linzhutils.py
+    ├── predict.py
+    ├── README.md
+    ├── requirements.txt
+    ├── scripts
+    │   └── download_data.sh
+    ├── test.py
+    ├── train.py
+    ├── unet
+    │   ├── __init__.py
+    │   ├── unet_model.py
+    │   └── unet_parts.py
+    └── utils
+        ├── data_loading.py
+        ├── dice_score.py
+        ├── __init__.py
+        └── utils.py
 ```
 
 ## How to get started
@@ -24,40 +77,24 @@ Please read the following instructions carefully before you start.
 
 ### Install requirements
 
-Make sure that u install all libraries.
+Make sure that you installed all libraries, or you could use the modules on [Puhti](https://www.puhti.csc.fi/).
 
-TODO:
-- [ ] add requirements.txt
+To use the Puhti modules, you need to load the modules first.
 
-<!-- 
-We also provide a `requirements.txt` for pip. Use the following command to install.
-
-``pip install -r requirements.txt``
-
-NB: If you are using Macbook with Apple silicon, you can install `mediapipe-silicon` instead of `mediapipe`, but they said that mediapipe will support Apple silicon soon. And use `requirements_maxOS.txt` instead of `requirements.txt`. -->
+1. For downloading the data, you need to load the `geoconda` module. You can use `module load geoconda` to load this module. If you prefer the Puhti JupyterLab, you can select the `geoconda` module in the `Settings/Python` tab on dashboard.
+2. For training the model or using the model to predict, you need to load the `pytorch` module.
 
 ### Download dataset
-<<<<<<< HEAD
-
-TODO: 
-- [x] add argument parser
-1. run `preprocess/data_downloader.py`, such as `python preprocess/data_downloader.py`.
-=======
-- There are two version of downloader, one is `data_downloader.py`, the other is `data_downloader_parallel.py`. The first one is a single thread downloader, the second one is a multi-thread downloader. The second one is faster, but it may cause some problems, such as `ConnectionResetError` beucase the server might limit our requests. If you want to use the second one, please make sure that you have a stable network. However, to simplify our statement, we will use the first one in the following instructions.
-- Run `preprocess/data_downloader.py` at **root** folder, such as `python preprocess/data_downloader.py`.
-- There are some arguments you can use, type `python preprocess/data_downloader.py --help` or to see more.
-- The size of each tile is 5120x5120, which shows the 1km*1km area. You could split them later.
->>>>>>> 06ce86bf243d6246e80521bd53770ec57ca8597a
+- In our project, there are two versions of the downloader script available to download data: `data_downloader.py` and `data_downloader_parallel.py`. The former is a single-thread downloader, while the latter is a multi-thread downloader that offers faster downloading speeds. However, the multi-thread downloader may cause issues such as `ConnectionResetError` due to server limitations, so it's essential to ensure a stable network connection when using it and do not start too many threads at same time. For simplicity, we will be using the single-thread downloader in the following instructions.
+- To download the data, navigate to the root folder of the project and run `preprocess/data_downloader.py`, for example, `python preprocess/data_downloader.py`. There are various arguments you can use with this script; for more information, run python `preprocess/data_downloader.py --help`.
+- When using the `data_downloader.py` script, each tile downloaded will have a default configuration of 5120x5120 pixels, covering an area of 1km x 1km for reducing the . you can further split these tiles to suit your needs. To do this, you can use any image processing library or tool of your choice.
 
 ### Process the masks and images
 
-TODO:
-- [ ] add argument parser
-- [ ] add split function
+- There are two version of processer, `mask_process_kuusi.py` is for kuusi dataset, which means you only want to detect the existence of kuusi. `mask_process.py` is for the whole dataset, which means you want to detect the forest dominated by kuusi.
 
+`mask_process_kuusi.py` is a script that converts color masks to binary masks. The script takes as input a set of color masks in the form of .jpg, .png or .jpeg files located in a folder called "color_masks", specified by the variable INPUT_PATH. It then processes each mask to create a binary mask and saves it to a folder called "bin_masks", specified by the variable OUTPUT_PATH. The binary mask is created by setting all pixels in the color mask that match any of the colors in COLOR_LIST to 1 and all other pixels to 0. The purpose of this script is to prepare data for further processing in the research project, specifically to simplify the forest/non-forest classification task by converting color-coded labels into binary labels.
 
-- There are two version of processer, `mask_process_kuusi.py` is for kuusi dataset, which means you only want to detect the existence of kuusi. `mask_process.py` is for the whole dataset, which means you want to detect the forest dominated by kuusi. However, to simplify our statement, we will use the first one in the following instructions.
-- run `preprocess/mask_process.py`.
 
 ### Train your model
 

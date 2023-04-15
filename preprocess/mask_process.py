@@ -5,62 +5,7 @@ import numpy as np
 import os
 from collections import defaultdict
 from tqdm import tqdm
-<<<<<<< HEAD
 import linzhutils as lu
-=======
-
-TEN_COLORS = [(0, 114, 254), (70, 152, 254), (165, 205, 154), (195, 255, 195),
-              (115, 243, 131), (22, 231, 24), (0, 205, 2), (0, 130, 1),
-              (220, 0, 23), (149, 31, 40)]
-
-SIX_COLORS = [TEN_COLORS[0], TEN_COLORS[2], TEN_COLORS[4]] + TEN_COLORS[6:]
-
-DEFAULT_SHAPE = (512, 512)
-
-COLOR_NUMBER_MAP = {
-    'koivu': {
-        'number':
-        [0, (1 + 4) / 2, (5 + 12) / 2, (13 + 27) / 2, (28 + 54) / 2, 55 * 1.1],
-        'color':
-        SIX_COLORS,
-    },
-    'muulp': {
-        'number': [0, 1, 2, (3 + 4) / 2, (5 + 16) / 2, 17 * 1.1],
-        'color': SIX_COLORS,
-    },
-    'manty': {
-        'number': [
-            0,
-            (1 + 9) / 2,
-            (10 + 20) / 2,
-            (21 + 35) / 2,
-            (36 + 51) / 2,
-            (52 + 68) / 2,
-            (69 + 87) / 2,
-            (88 + 108) / 2,
-            (109 + 144) / 2,
-            160 * 1.1,
-        ],
-        'color':
-        TEN_COLORS,
-    },
-    'kuusi': {
-        'number': [
-            0, 1, (2 + 3) / 2, (4 + 7) / 2, (8 + 15) / 2, (16 + 29) / 2,
-            (30 + 52) / 2, (53 + 95) / 2, (96 + 184) / 2, 200 * 1.1
-        ],
-        'color':
-        TEN_COLORS,
-    },
-}
-
-INPUT_PATH = './data/hel2019/color_masks/'
-OUTPUT_PATH = './data/hel2019/bin_masks/'
-# COLOR_LIST = [(255, 255, 255), (0, 114, 254)]
-LABEL_LIST = ['koivu', 'muulp', 'manty', 'kuusi']
-
-folder_list = lu.getFolderList(INPUT_PATH)
->>>>>>> 06ce86bf243d6246e80521bd53770ec57ca8597a
 
 
 def get_images(file_name, folder_list, input_path):
@@ -134,11 +79,6 @@ if __name__ == '__main__':
 
     file_list = lu.getFileList(os.path.join(input_path, folder_list[0]))
     for file_name in tqdm(file_list):
-<<<<<<< HEAD
         bin_mask = bin_mask_process(file_name, default_shape, folder_list,
                                     color_map, input_path)
         cv2.imwrite(os.path.join(output_path, file_name), bin_mask)
-=======
-        bin_mask = bin_mask_process(file_name)
-        cv2.imwrite(os.path.join(OUTPUT_PATH, file_name), bin_mask)
->>>>>>> 06ce86bf243d6246e80521bd53770ec57ca8597a
