@@ -1,7 +1,22 @@
+"""
+#
+Manual of Linzh's Util
+#
+1. Use '/' instead of '\\' in path stringf or rewrite some functions.
+#
+#
+##############################################################################
+"""
+
+# Divide Dataset
+# from sklearn.model_selection import train_test_split
+# x_train,x_test, y_train, y_test = train_test_split(train_data,train_target,test_size=0.3, random_state=0)
+
 import os
 from pathlib import Path
 import shutil
 from tqdm import tqdm
+import random
 
 
 def movePairFile(src1, src2, dst1, dst2=None):
@@ -90,9 +105,9 @@ def filesRename(folderPath, addName):
 
 
 def getFileList(path):
-    files = os.listdir(path)
-    filtered_files = [f for f in files if not f.startswith('.')]
-    return filtered_files
+    for a, b, file in os.walk(path):
+        return file
+
 
 def getAllFileList(path):
     ls = []
@@ -103,7 +118,8 @@ def getAllFileList(path):
 
 
 def getFolderList(path):
-    return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+    for a, folder, c in os.walk(path):
+        return folder
 
 
 def getFileContent(filePath):
@@ -114,3 +130,28 @@ def getFileContent(filePath):
 def checkDir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+def splitData(src, dst, ratio, seed=42):
+    checkDir(dst)
+    fileList = getFileList(src)
+    random.seed(seed)
+    moveList = random.sample(fileList, int(len(fileList) * ratio))
+    for i in tqdm(moveList):
+        shutil.move(f'{os.path.join(src, i)}', f'{os.path.join(dst, i)}')
+
+        
+def splitMultiData(src_list, dst_list, ratio=0.7, seed=42):
+    '''
+    Split data in multi folders, e.g. images and masks.
+    '''
+    assert len(src_list) == len(dst_list)
+    random.seed(seed)
+    file_list = getFileList(src_list[0])
+    move_list = random.sample(file_list, int(len(file_list) * (1-ratio)))
+    for j in range(len(dst_list)):
+        checkDir(dst_list[j])
+        for i in range(len(move_list)):
+            file_name = move_list[i]
+            shutil.move(os.path.join(src_list[j], file_name),
+                        os.path.join(dst_list[j], file_name))

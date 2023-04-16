@@ -8,8 +8,8 @@
         "kuusi"
     ],
     "default_shape": [
-        512,
-        512
+        5120,
+        5120
     ],
     "color_map": {
         "koivu": {

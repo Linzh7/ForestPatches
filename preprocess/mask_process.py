@@ -53,7 +53,7 @@ if __name__ == '__main__':
         '-c',
         '--config',
         help='path of the configuration file',
-        default='./preprocess/1.json',
+        default='./preprocess/mask_conf_all_tree.json',
     )
     # required=True)
     args = parser.parse_args()
