@@ -1,6 +1,6 @@
 {
-    "input_path": "./data/hel2019/color_masks/",
-    "output_path": "./data/hel2019/bin_masks/",
+    "input_path": "/scratch/project_2007251/data/hel2019/color_masks/kuusi",
+    "output_path": "/scratch/project_2007251/data/hel2019/kussi_masks/",
     "color_list": [
         [255, 255, 255],
         [0, 114, 254]
