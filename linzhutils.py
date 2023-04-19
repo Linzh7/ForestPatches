@@ -53,9 +53,9 @@ def removeFile(path, pattern):
 
 def moveFileTo(src, dst, fileNamePattern):
     fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Moving {i}...')
+    for i in tqdm(list(fileList)):
+        fileName = str(i).split('/')[-1]
+        # print(f'[LinzhUtil] Moving {i}...')
         shutil.move(i, f'{os.path.join(dst, fileName)}')
 
 
@@ -74,9 +74,9 @@ def getFileListFromPattern(path, pattern):
 
 def copyFileTo(src, dst, fileNamePattern):
     fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Copying {i}...')
+    for i in tqdm(list(fileList)):
+        fileName = str(i).split('/')[-1]
+        # print(f'[LinzhUtil] Copying {i}...')
         shutil.copyfile(i, f'{os.path.join(dst, fileName)}')
 
 
