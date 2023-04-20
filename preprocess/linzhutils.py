@@ -1,21 +1,10 @@
-###############################################################################
-##
-# Manual of Linzh's Util
-##
-# 1. Use '/' instead of '\\' in path stringf or rewrite some functions.
-##
-##
-###############################################################################
-
-# Divide Dataset
-# from sklearn.model_selection import train_test_split
-# x_train,x_test, y_train, y_test = train_test_split(train_data,train_target,test_size=0.3, random_state=0)
-
 import os
 from pathlib import Path
 import shutil
 from tqdm import tqdm
 
+def isFolderEmpty(folderPath):
+    return len(os.listdir(folderPath)) == 0
 
 def movePairFile(src1, src2, dst1, dst2=None):
     if dst2 == None:
@@ -41,29 +30,44 @@ def movePairFile(src1, src2, dst1, dst2=None):
         else:
             j += 1
 
+def checkDir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-def removeFile(path, pattern):
-    fileList = Path(path).rglob(pattern)
-    for i in tqdm(fileList):
-        print(f'[LinzhUtil] Removing {i}...')
-        os.remove(i)
+def moveFileTo(src, dst, fileNamePattern):
+    if not isFolderEmpty(dst):
+        confirm = input(f"WARNING: {dst} is not empty. Do you want to proceed? (y/n) ")
+        if confirm.lower() != 'y':
+            print("Aborting move operation")
+            return
+    checkDir(dst)
+    fileList = getFileListFromPattern(src)
+    fileCount = len(list(fileList))
+    if fileCount == 0:
+        print(f"No files found in {src} that match pattern {fileNamePattern}")
+        return
+    print(f"Found {fileCount} files in {src} that match pattern {fileNamePattern}")
+    for i in tqdm(list(fileList)):
+        fileName = str(i).split('/')[-1]
+        shutil.move(i, f'{os.path.join(dst, fileName)}')
 
 
 def moveFileTo(src, dst, fileNamePattern):
-    fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Moving {i}...')
+    if not isFolderEmpty(dst):
+        confirm = input(f"WARNING: {dst} is not empty. Do you want to proceed? (y/n) ")
+        if confirm.lower() != 'y':
+            print("Aborting move operation")
+            return
+    checkDir(dst)
+    fileList = getFileListFromPattern(src)
+    fileCount = len(list(fileList))
+    if fileCount == 0:
+        print(f"No files found in {src} that match pattern {fileNamePattern}")
+        return
+    print(f"Found {fileCount} files in {src} that match pattern {fileNamePattern}")
+    for i in tqdm(list(fileList)):
+        fileName = str(i).split('/')[-1]
         shutil.move(i, f'{os.path.join(dst, fileName)}')
-
-
-def moveFileTo_DEBUG(src, dst, fileNamePattern):
-    fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Moving {i}...')
-        shutil.move(i, f'{os.path.join(dst, fileName)}')
-        break
 
 
 def getFileListFromPattern(path, pattern):
@@ -71,21 +75,11 @@ def getFileListFromPattern(path, pattern):
 
 
 def copyFileTo(src, dst, fileNamePattern):
+    checkDir(dst)
     fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Copying {i}...')
+    for i in tqdm(list(fileList)):
+        fileName = str(i).split('/')[-1]
         shutil.copyfile(i, f'{os.path.join(dst, fileName)}')
-
-
-def copyFileTo_DEBUG(src, dst, fileNamePattern):
-    fileList = Path(src).rglob(fileNamePattern)
-    for i in tqdm(fileList):
-        fileName = str(i).split('\\')[-1]
-        print(f'[LinzhUtil] Copying {i}...')
-        shutil.copyfile(i, f'{os.path.join(dst, fileName)}')
-        break
-
 
 def printNotInstance(ls, type):
     for i in ls:
@@ -103,9 +97,9 @@ def filesRename(folderPath, addName):
 
 
 def getFileList(path):
-    for a, b, file in os.walk(path):
-        return file
-
+    files = os.listdir(path)
+    filtered_files = [f for f in files if not f.startswith('.')]
+    return filtered_files
 
 def getAllFileList(path):
     ls = []
@@ -116,15 +110,10 @@ def getAllFileList(path):
 
 
 def getFolderList(path):
-    for a, folder, c in os.walk(path):
-        return folder
+    return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
 
 
 def getFileContent(filePath):
     with open(filePath, 'rb') as fp:
         return fp.read()
 
-
-def checkDir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)

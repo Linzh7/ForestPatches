@@ -1,6 +1,6 @@
 {
-    "input_path": "./data/hel2019/color_masks/",
-    "output_path": "./data/hel2019/bin_masks/",
+    "input_path": "/scratch/project_2007251/data/hel2019/color_masks/",
+    "output_path": "/scratch/project_2007251/data/hel2019/bin_masks/",
     "folder_prefix_list": [
         "koivu",
         "muulp",
@@ -8,8 +8,8 @@
         "kuusi"
     ],
     "default_shape": [
-        512,
-        512
+        5120,
+        5120
     ],
     "color_map": {
         "koivu": {

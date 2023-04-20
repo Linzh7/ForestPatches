@@ -26,7 +26,8 @@ if __name__ == '__main__':
     parser.add_argument('-c',
                         '--config',
                         help='path to config file',
-                        required=True)
+                        default='./preprocess/mask_conf_kussi.json',
+                       )
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:

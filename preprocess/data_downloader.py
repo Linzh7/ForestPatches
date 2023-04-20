@@ -92,10 +92,16 @@ LATI_IN_M = 0.00127279275 * TILE_SIZE
 # y_max = 60.295403
 
 # Test train size, smaller
-x_min = 24.8593
-y_min = 60.2003
-x_max = 24.9484
-y_max = 60.2834
+# x_min = 24.8593
+# y_min = 60.2003
+# x_max = 24.9484
+# y_max = 60.2834
+
+# Whole Helsinki area
+x_min = 24.8121
+y_min = 60.1415
+x_max = 25.1984
+y_max = 60.3033
 
 # no_tiles_x = 10  #number of pictures along x-axis
 # no_tiles_y = 10  #number of pictures along y-axis

@@ -1,0 +1,6 @@
+{
+    "input_path": "/scratch/project_2007251/data/hel20xx/kussi_masks_bigger",
+    "output_path": "/scratch/project_2007251/data/hel20xx/kussi_masks",
+    "memory_threshold": 8,
+    "batch": 20
+}
