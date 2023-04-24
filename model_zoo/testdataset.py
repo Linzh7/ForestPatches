@@ -48,21 +48,21 @@ class Dataset(BaseDataset):
         # read data
         image = cv2.imread(self.images_fps[i])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        mask = cv2.imread(self.masks_fps[i], 0)
+        mask = image
 
         # extract certain classes from mask (e.g. cars)
-        masks = [(mask == v) for v in self.class_values]
-        mask = np.stack(masks, axis=-1).astype('float')
+        # masks = [(mask == v) for v in self.class_values]
+        # mask = np.stack(masks, axis=-1).astype('float')
 
         # apply augmentations
-        if self.augmentation:
-            sample = self.augmentation(image=image, mask=mask)
-            image, mask = sample['image'], sample['mask']
+        # if self.augmentation:
+        #     sample = self.augmentation(image=image, mask=mask)
+        #     image, mask = sample['image'], sample['mask']
 
         # apply preprocessing
         if self.preprocessing:
-            sample = self.preprocessing(image=image, mask=mask)
-            image, mask = sample['image'], sample['mask']
+            sample = self.preprocessing(image=image)
+            image = sample['image']
 
         return image, mask
 
