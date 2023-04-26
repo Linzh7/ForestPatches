@@ -1,5 +1,7 @@
 # Forest Patches
 
+![Final result](https://github.com/Linzh7/ForestPatches/blob/linzh/assets/GIS-screenshot.png?raw=true)
+
 Welcome to our research project, where we aim to investigate the impact of past forest fragmentation on the evolution of insect population traits. To achieve this, we are exploring ways to digitize, detect, and extract past forest patches from historical aerial photographs. Our primary objective is to develop a tool that can accurately classify forest and non-forest areas with a specific threshold based on ground truth data. The tool will help us detect past forest patches, starting from present aerial images and going back to older images. Students working on this project will supervise open access aerial images with two possible ground truth datasets: biomass and canopy cover raster GIS data sets provided by the Natural Resources Institute Finland, and the Corine Land Cover (CLC) GIS data set about land use types provided by the Finnish Environmental Institute. As we move towards older aerial images, ground truth data become scarce or non-existent, and we will rely on the tool's training on newer or present data to recognize forest patches. Key elements for image recognition and classification are image texture and relative differences in color attributes. Aerial photographs are from different phenological stages and light conditions. Newer images are colored, whereas older ones are grayscale. Open access aerial images are available through the WMS interface provided by the HRI (Helsinki Region Infoshare) from 1932 to 2021.
 
 
