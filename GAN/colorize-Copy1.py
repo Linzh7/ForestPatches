@@ -17,8 +17,8 @@ warnings.filterwarnings("ignore", category=UserWarning, message=".*?Your .*? set
 
 colorizer = get_image_colorizer(artistic=True)
 
-INPUT_DIR = '/scratch/project_2007251/hel2006/images'
-OUTPUT_DIR = '/scratch/project_2007251/hel2006/colored_images'
+INPUT_DIR = '/scratch/project_2007251/hel1996/images'
+OUTPUT_DIR = '/scratch/project_2007251/hel1996/colored_images'
 lu.checkDir(OUTPUT_DIR)
 INTENSITY = 100 # set above over 100 for better performance, however 110 might be the max value for A100
 
