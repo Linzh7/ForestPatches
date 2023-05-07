@@ -9,7 +9,7 @@ class DeviceException(Exception):
 
 class _Device:
     def __init__(self):
-        self.set(DeviceId.CPU)
+        self.set(DeviceId.GPU0)
 
     def is_gpu(self):
         ''' Returns `True` if the current device is GPU, `False` otherwise. '''
@@ -21,8 +21,10 @@ class _Device:
     def set(self, device:DeviceId):     
         if device == DeviceId.CPU:
             os.environ['CUDA_VISIBLE_DEVICES']=''
+            print('Device: CPU')
         else:
             os.environ['CUDA_VISIBLE_DEVICES']=str(device.value)
+            print('Device: GPU')
             import torch
             torch.backends.cudnn.benchmark=False
         
