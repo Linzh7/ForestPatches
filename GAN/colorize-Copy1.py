@@ -17,10 +17,15 @@ warnings.filterwarnings("ignore", category=UserWarning, message=".*?Your .*? set
 
 colorizer = get_image_colorizer(artistic=True)
 
-INPUT_DIR = '/scratch/project_2007251/hel1996/images'
-OUTPUT_DIR = '/scratch/project_2007251/hel1996/colored_images'
+YEAR='2006'
+
+INPUT_DIR = f'/scratch/project_2007251/hel{YEAR}/images'
+OUTPUT_DIR = f'/scratch/project_2007251/hel{YEAR}/colored_images'
+
 lu.checkDir(OUTPUT_DIR)
 INTENSITY = 100 # set above over 100 for better performance, however 110 might be the max value for A100
+
+print(INPUT_DIR)
 
 file_list = sorted(lu.getFileList(INPUT_DIR))
 target_file_list = sorted(lu.getFileList(OUTPUT_DIR))
