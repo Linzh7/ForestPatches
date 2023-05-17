@@ -100,11 +100,6 @@ To use the Puhti modules, you need to load the modules first.
 
 ### Train your model
 
-TODO:
-- [ ] find a best model
-- [ ] add argument parser
-- [ ] make the train and test more flexible
-
 - There are two ways to train the model. The U-Net model is in `UNet` folder, you can run `train.py` to train the model.
 
 - The other way is to much flexible in `model_zoo` folder. You could know more of methods and backbones in [here](https://github.com/qubvel/segmentation_models.pytorch). You could follow the instructions in `model_zoo/train.ipynb` to train your model.
@@ -117,13 +112,13 @@ TODO:
 - run `UNet/test.py` to predict a whole folder.
 
 #### Model Zoo
-- run `model_zoo/predict.ipynb` to predict a single image or few images as a list.
-- run `model_zoo/test.ipynb` to test the model on some dataset.
+- run `model_zoo/run_prediction.ipynb` to run inference on a dataset.
 
 
-<!-- 1. run `main.py`
-1. act some sign to the camera
-2. after the program comfirm your sign, it will play the corresponding English word
-3. enjoy
+## Credits
 
-*If you do not like the Preview window, you can set`SHOW = False`* -->
+In this project, the following repositories are used:
+
+- [UNet](https://github.com/milesial/Pytorch-UNet)
+- [Seamentation Models](https://github.com/qubvel/segmentation_models.pytorch)
+- [DeOldify](https://github.com/jantic/DeOldify)
